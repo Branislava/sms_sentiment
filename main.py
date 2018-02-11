@@ -263,7 +263,6 @@ if __name__ == '__main__':
     print('\\hline')
     print('%s&%.3f&%.3f&%.3f&%.3f\\\\\\hline' % ('Average', np.mean(accuracy), np.mean(recall), np.mean(precision), np.mean(f_score)))
 
-    '''
     # train/test sets
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42)
     print(np.shape(X_train), np.shape(y_train), np.shape(X_test), np.shape(y_test))
@@ -302,4 +301,3 @@ if __name__ == '__main__':
     
     # plot confusion matrix
     plot_confusion_matrix(confusion_matrix(y_test, y_pred), title='Non-normalized Confusion Matrix')
-    '''
