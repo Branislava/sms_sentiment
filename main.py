@@ -15,6 +15,8 @@ import pandas as pd
 from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import learning_curve
 import itertools
+from sklearn.model_selection import KFold
+from sklearn.metrics import classification_report, accuracy_score, confusion_matrix, f1_score, precision_score, recall_score
 
 def draw_class_dist(objects, dataset_dist, train_dist, title, filename):
     
@@ -61,7 +63,7 @@ def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
     plt.legend(loc="best")
     plt.savefig('learning-curve.png')
     
-def plot_confusion_matrix(cm, classes,
+def plot_confusion_matrix(cm, 
                           normalize=False,
                           title='Confusion matrix',
                           cmap=plt.cm.Blues):
@@ -70,6 +72,7 @@ def plot_confusion_matrix(cm, classes,
     Normalization can be applied by setting `normalize=True`.
     """
     
+    classes = ('negative', 'neutral', 'positive')
     plt.figure()
     plt.imshow(cm, interpolation='nearest', cmap=cmap)
     plt.title(title)
@@ -88,6 +91,7 @@ def plot_confusion_matrix(cm, classes,
     plt.tight_layout()
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
+    #plt.show()
     plt.savefig('confusion_matrix.png')
     
 def show_values(pc, fmt="%.2f", **kw):
@@ -234,7 +238,32 @@ if __name__ == '__main__':
     y = np.array(df['class'])
     X = np.array(df.ix[:, df.columns != 'class'])
     print(np.shape(X), np.shape(y))
+    
+    clf = LinearSVC(C=0.1, penalty='l2')
+    
+    # 1 - positive class
+    accuracy = []
+    f_score = []
+    recall = []
+    precision = []
+    kf = KFold(n_splits=5)
+    for train, test in kf.split(X):
+        
+        y_pred = clf.fit(X[train], y[train]).predict(X[test])
+        
+        accuracy.append(accuracy_score(y[test], y_pred))
+        recall.append(recall_score(y[test], y_pred, average='weighted', labels=[0]))
+        precision.append(precision_score(y[test], y_pred, average='weighted', labels=[0]))
+        f_score.append(f1_score(y[test], y_pred, average='weighted', labels=[0]))
+      
+    print('\\hline')
+    print('Fold&Accuracy&Recall&Precision&F-score\\\\\\hline')
+    for i in range(5):
+        print('%d&%.3f&%.3f&%.3f&%.3f\\\\\\hline' % ((i + 1, accuracy[i], recall[i], precision[i], f_score[i])))
+    print('\\hline')
+    print('%s&%.3f&%.3f&%.3f&%.3f\\\\\\hline' % ('Average', np.mean(accuracy), np.mean(recall), np.mean(precision), np.mean(f_score)))
 
+    '''
     # train/test sets
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42)
     print(np.shape(X_train), np.shape(y_train), np.shape(X_test), np.shape(y_test))
@@ -272,5 +301,5 @@ if __name__ == '__main__':
     plot_learning_curve(clf, 'Learning curve for LinearSVC(C=0.1, penalty="l2")', X, y, (0.85, 1.01), cv=k, n_jobs=4)
     
     # plot confusion matrix
-    plot_confusion_matrix(confusion_matrix(y_test, y_pred), classes=classes, title='Non-normalized Confusion Matrix')
-    
+    plot_confusion_matrix(confusion_matrix(y_test, y_pred), title='Non-normalized Confusion Matrix')
+    '''
