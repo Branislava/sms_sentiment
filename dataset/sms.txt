@@ -1,0 +1,6 @@
+Ej,sta se radi,uvece oko 7,odgovara?|NEU
+Poštovani , vozilo 11 je na adresi. Vaš GOLUB TAXI|NEU
+ajoj :-) javi molim te :-)|POS
+U redu, hvala, srecan put!|POS
+Brande moj, cu li ti... :(|NEG
+Nema na cemu, nisam znao da je toliko hitno :-(|NEG
